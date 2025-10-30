@@ -1,0 +1,7 @@
+{
+  "name": "Liveops UNITY.hubX",
+  "description": "A communication-first agentic ecosystem for transforming customer interactions through human-aligned, AI-driven voice orchestration. Create, manage, and deploy advanced AI voice agents for your business.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
