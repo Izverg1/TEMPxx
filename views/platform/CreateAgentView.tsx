@@ -121,12 +121,6 @@ const CreateAgentView: React.FC<CreateAgentViewProps> = ({ onAgentSubmit, onBack
             setOnCall(agentToEdit.onCall);
         }
     }, [agentToEdit, isEditMode]);
-
-    useEffect(() => {
-        if (deploymentType === 'UNITY_Internal') {
-            setTtsModel('gemini-2.5-flash-preview-tts');
-        }
-    }, [deploymentType]);
     
     const handleTemplateSelect = (template: keyof typeof agentTemplates) => {
         const selected = agentTemplates[template];
@@ -444,17 +438,11 @@ const CreateAgentView: React.FC<CreateAgentViewProps> = ({ onAgentSubmit, onBack
                                             id="ttsModel"
                                             value={ttsModel}
                                             onChange={e => setTtsModel(e.target.value as any)}
-                                            className="w-full h-10 bg-brand-bg-light border border-brand-border rounded-md px-3 text-brand-text-light focus:ring-0 focus:shadow-glow-primary disabled:opacity-50"
-                                            disabled={deploymentType === 'UNITY_Internal'}
+                                            className="w-full h-10 bg-brand-bg-light border border-brand-border rounded-md px-3 text-brand-text-light focus:ring-0 focus:shadow-glow-primary"
                                         >
                                             <option value="gemini-2.5-flash-preview-tts">Gemini TTS</option>
                                             <option value="ElevenLabs-v2">ElevenLabs v2</option>
                                         </select>
-                                        {deploymentType === 'UNITY_Internal' && (
-                                            <p className="text-xs text-brand-text-dark">
-                                                Gemini TTS is used for internal deployments.
-                                            </p>
-                                        )}
                                     </div>
                                      <div className="space-y-2">
                                         <label className="text-sm font-medium">Voice Profile Customization</label>
