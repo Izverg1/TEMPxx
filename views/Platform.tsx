@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Agent, Project, Task, View, Alert, ApiTool } from '../types';
+import { Agent, Project, Task, View, Alert, ApiTool, Workflow, WorkflowNode, Edge } from '../types';
 import Sidebar from '../components/platform/Sidebar';
 import Header from '../components/platform/Header';
 import DashboardView from './platform/DashboardView';
@@ -48,7 +48,7 @@ const MOCK_AGENTS: Agent[] = [
       { segment: 'Age Bucket: 45-54', avgTransactionValue: 65, fcr: 75, sentimentScore: 0.85 },
       { segment: 'Region Code: US-West', avgTransactionValue: 78, fcr: 82, sentimentScore: 0.88 },
     ], onCall: false, workflowId: 'wf-support-standard' },
-    { id: 'agent-002', projectId: 'proj-01', name: 'Orion', avatarUrl: `https://i.pravatar.cc/150?u=orion`, useCase: 'Sales', status: 'Active', deploymentType: 'UNITY_Internal', interactions: 830, fcr: 72, escalationRate: 20, sentimentScore: 0.8, workflowsCompleted: 650, valueGenerated: 15500, createdAt: '2023-09-15', personality: 'Persuasive and knowledgeable', backstory: 'Expert in product features and benefits.', greeting: 'Hi there! I\'m Orion. I can help you find the perfect product for your needs.', voiceProfile: { gender: 'Male', region: 'US-West', style: 'Professional' }, ttsModel: 'gemini-2.5-flash-preview-tts', monthlyBudget: 15000, performanceHistory: [], audienceSegments: [
+    { id: 'agent-002', projectId: 'proj-01', name: 'AIDA', avatarUrl: 'https://images.unsplash.com/photo-1614289371518-722f2615943d?q=80&w=1000&auto=format&fit=crop', useCase: 'Sales', status: 'Active', deploymentType: 'UNITY_Internal', interactions: 830, fcr: 72, escalationRate: 20, sentimentScore: 0.8, workflowsCompleted: 650, valueGenerated: 15500, createdAt: '2023-09-15', personality: 'Persuasive and knowledgeable', backstory: 'I am AIDA, an advanced AI sales agent specializing in lead qualification and appointment booking. I analyze customer needs to provide tailored solutions, ensuring a seamless and efficient sales process.', greeting: 'Hi there! I\'m AIDA. I can help you find the perfect product for your needs.', voiceProfile: { gender: 'Male', region: 'US-West', style: 'Professional' }, ttsModel: 'gemini-2.5-flash-preview-tts', monthlyBudget: 15000, performanceHistory: [], audienceSegments: [
       { segment: 'Age Bucket: 35-44', avgTransactionValue: 120, fcr: 75, sentimentScore: 0.85 },
       { segment: 'Product Affinity: Electronics', avgTransactionValue: 250, fcr: 80, sentimentScore: 0.88 },
       { segment: 'Region Code: US-West', avgTransactionValue: 110, fcr: 70, sentimentScore: 0.80 },
@@ -85,7 +85,41 @@ const MOCK_API_TOOLS: ApiTool[] = [
     { name: 'dateTime', type: 'string', required: true },
     { name: 'duration', type: 'number', required: false },
   ], apiKeySet: false },
+  { id: 'tool-4', name: 'searchKnowledgeBase', description: 'Searches the internal knowledge base for articles related to a query.', endpoint: 'https://api.internal-kb.com/search', httpMethod: 'GET', parameters: [
+    { name: 'query', type: 'string', required: true },
+    { name: 'filterByCategory', type: 'string', required: false },
+  ], apiKeySet: true },
 ];
+
+const MOCK_WORKFLOWS_DATA: Workflow[] = [
+    {
+        id: 'wf-sales-q4',
+        name: 'Q4 Sales Inquiry Flow',
+        nodes: [
+            { id: 'n1', type: 'Start', position: { x: 0, y: 0 }, data: { title: 'Incoming Lead', description: '', config: {} } },
+            { id: 'n2', type: 'Tool', position: { x: 0, y: 0 }, data: { title: 'Adding New Contact', description: '', config: {} } },
+            { id: 'n3', type: 'Conditional', position: { x: 0, y: 0 }, data: { title: 'Calling', description: '', config: {} } },
+            { id: 'n4', type: 'Tool', position: { x: 0, y: 0 }, data: { title: 'Booking Appointment', description: '', config: {} } },
+            { id: 'n5', type: 'Tool', position: { x: 0, y: 0 }, data: { title: 'Sending Email', description: '', config: {} } },
+            { id: 'n6', type: 'Data', position: { x: 0, y: 0 }, data: { title: 'Adding Information', description: '', config: {} } },
+            { id: 'n7', type: 'Tool', position: { x: 0, y: 0 }, data: { title: 'Updating Contact', description: '', config: {} } },
+            { id: 'n8', type: 'Tool', position: { x: 0, y: 0 }, data: { title: 'Creating Call Summary', description: '', config: {} } },
+            { id: 'n9', type: 'End', position: { x: 0, y: 0 }, data: { title: 'Creating Call Summary', description: '', config: {} } },
+        ],
+        edges: [
+            { id: 'e1-2', source: 'n1', target: 'n2' },
+            { id: 'e2-3', source: 'n2', target: 'n3' },
+            { id: 'e3-4', source: 'n3', target: 'n4', label: 'Booked' },
+            { id: 'e4-5', source: 'n4', target: 'n5' },
+            { id: 'e5-8', source: 'n5', target: 'n8' },
+            { id: 'e3-6', source: 'n3', target: 'n6', label: 'Info' },
+            { id: 'e6-7', source: 'n6', target: 'n7' },
+            { id: 'e7-9', source: 'n7', target: 'n9' },
+        ]
+    },
+    // Add other workflows here...
+];
+
 
 const Platform: React.FC<PlatformProps> = ({ onExitPlatform }) => {
   const [view, setView] = useState<View>('dashboard');
@@ -94,6 +128,7 @@ const Platform: React.FC<PlatformProps> = ({ onExitPlatform }) => {
   const [tasks, setTasks] = useState<Task[]>(MOCK_TASKS);
   const [alerts, setAlerts] = useState<Alert[]>(MOCK_ALERTS);
   const [apiTools, setApiTools] = useState<ApiTool[]>(MOCK_API_TOOLS);
+  const [workflows, setWorkflows] = useState<Workflow[]>(MOCK_WORKFLOWS_DATA);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [agentToEdit, setAgentToEdit] = useState<Agent | null>(null);
   const [agentForLiveChat, setAgentForLiveChat] = useState<Agent | null>(null);
@@ -228,6 +263,7 @@ const Platform: React.FC<PlatformProps> = ({ onExitPlatform }) => {
           project={selectedProject}
           agents={agentsForProject} 
           alerts={alerts}
+          workflows={workflows}
           onLaunchNewAgent={handleCreateAgent}
           onAccessWorkflowBuilder={() => setView('workflow-builder')}
           onEditAgent={handleEditAgent}
@@ -241,6 +277,7 @@ const Platform: React.FC<PlatformProps> = ({ onExitPlatform }) => {
             project={selectedProject} 
             onBack={() => setView('project-agents')} 
             apiTools={apiTools}
+            workflows={workflows}
         />;
       case 'live-conversation':
         return agentForLiveChat ? <LiveConversationView agent={agentForLiveChat} onBack={() => setView('project-agents')} /> : null;

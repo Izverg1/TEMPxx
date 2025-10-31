@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Agent, Alert, Project } from '../../types';
+import { Agent, Alert, Project, Workflow } from '../../types';
 import { Button } from '../../components/ui/Button';
 import { AgentCard } from '../../components/platform/AgentCard';
 import { AgentProfileModal } from '../../components/platform/AgentProfileModal';
@@ -9,6 +9,7 @@ interface ProjectDetailViewProps {
   project: Project | undefined;
   agents: Agent[];
   alerts: Alert[];
+  workflows: Workflow[];
   onLaunchNewAgent: () => void;
   onAccessWorkflowBuilder: () => void;
   onEditAgent: (agent: Agent) => void;
@@ -31,7 +32,7 @@ const isAlertTriggered = (agent: Agent, alert: Alert): boolean => {
     }
 };
 
-const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ project, agents, alerts, onLaunchNewAgent, onAccessWorkflowBuilder, onEditAgent, onStartLiveConversation, onAddAlert, onDeleteAlert, onToggleAgentOnCall }) => {
+const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ project, agents, alerts, workflows, onLaunchNewAgent, onAccessWorkflowBuilder, onEditAgent, onStartLiveConversation, onAddAlert, onDeleteAlert, onToggleAgentOnCall }) => {
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [isQAModalOpen, setIsQAModalOpen] = useState(false);
 
@@ -63,6 +64,7 @@ const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ project, agents, 
   };
   
   const selectedAgentWithAlerts = agentsWithAlerts.find(a => a.id === selectedAgent?.id);
+  const selectedAgentWorkflow = selectedAgentWithAlerts?.workflowId ? workflows.find(w => w.id === selectedAgentWithAlerts.workflowId) : undefined;
 
   return (
     <div className="space-y-6">
@@ -99,15 +101,9 @@ const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ project, agents, 
       {selectedAgentWithAlerts && (
         <AgentProfileModal
           agent={selectedAgentWithAlerts}
-          alerts={selectedAgentWithAlerts.alerts}
-          isAlertTriggered={(alert) => isAlertTriggered(selectedAgentWithAlerts, alert)}
+          workflow={selectedAgentWorkflow}
           isOpen={!!selectedAgent}
           onClose={() => setSelectedAgent(null)}
-          onEdit={onEditAgent}
-          onStartLiveConversation={onStartLiveConversation}
-          onAddAlert={onAddAlert}
-          onDeleteAlert={onDeleteAlert}
-          onToggleOnCall={onToggleAgentOnCall}
         />
       )}
 

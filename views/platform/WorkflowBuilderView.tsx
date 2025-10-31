@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Project, WorkflowNode, NodeType, Edge, ApiTool } from '../../types';
+import { Project, WorkflowNode, NodeType, Edge, ApiTool, Workflow } from '../../types';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { DraggableNode } from '../../components/platform/WorkflowNode';
@@ -8,6 +8,7 @@ import { WorkflowConfigPanel } from '../../components/platform/WorkflowConfigPan
 interface WorkflowBuilderViewProps {
   project: Project | undefined;
   apiTools: ApiTool[];
+  workflows: Workflow[];
   onBack: () => void;
 }
 
@@ -41,39 +42,31 @@ const NodePaletteItem: React.FC<{ nodeType: typeof nodeTypes[0], onDragStart: (e
 
 const initialNodes: WorkflowNode[] = [
   { id: 'start', type: 'Start', position: { x: 50, y: 200 }, data: { title: 'Start', description: 'Trigger for sales workflow', config: {} } },
-  
   { id: 'llm-qualify', type: 'LLM', position: { x: 250, y: 200 }, data: { title: 'Qualify Lead', description: 'Ask qualifying questions to the user.', config: { prompt: 'To find the best solution for you, could you tell me about your team size and current challenges?' } } },
-
   { id: 'cond-is-qualified', type: 'Conditional', position: { x: 450, y: 200 }, data: { title: 'Is Lead Qualified?', description: 'Routes based on qualification status.', config: { condition: 'user.interest_score > 7' } } },
-
   { id: 'tool-schedule-demo', type: 'Tool', position: { x: 650, y: 100 }, data: { title: 'Schedule Demo', description: 'Calls API to schedule a product demo.', config: { toolId: 'tool-3', parameterValues: {} } } },
-
   { id: 'llm-not-qualified', type: 'LLM', position: { x: 650, y: 300 }, data: { title: 'Nurture Lead', description: 'Provide resources for non-qualified leads.', config: { prompt: 'Thanks for the information. Here are some resources that might be helpful for now...' } } },
-
   { id: 'tool-update-crm', type: 'Tool', position: { x: 850, y: 200 }, data: { title: 'Update CRM Record', description: 'Log interaction summary to CRM.', config: { toolId: 'tool-1', parameterValues: { customerId: '{session.customerId}', data: '{session.interactionSummary}' } } } },
-
   { id: 'end', type: 'End', position: { x: 1050, y: 200 }, data: { title: 'End', description: 'End of workflow.', config: {} } },
 ];
 
 const initialEdges: Edge[] = [
   { id: 'e-start-qualify', source: 'start', target: 'llm-qualify' },
   { id: 'e-qualify-cond', source: 'llm-qualify', target: 'cond-is-qualified' },
-  
-  // Branching from conditional
   { id: 'e-cond-schedule', source: 'cond-is-qualified', target: 'tool-schedule-demo' },
   { id: 'e-cond-nurture', source: 'cond-is-qualified', target: 'llm-not-qualified' },
-
-  // Converging to CRM update
   { id: 'e-schedule-crm', source: 'tool-schedule-demo', target: 'tool-update-crm' },
   { id: 'e-nurture-crm', source: 'llm-not-qualified', target: 'tool-update-crm' },
-
-  // Final edge to End
   { id: 'e-crm-end', source: 'tool-update-crm', target: 'end' },
 ];
 
-const WorkflowBuilderView: React.FC<WorkflowBuilderViewProps> = ({ project, onBack, apiTools }) => {
-  const [nodes, setNodes] = useState<WorkflowNode[]>(initialNodes);
-  const [edges, setEdges] = useState<Edge[]>(initialEdges);
+const WorkflowBuilderView: React.FC<WorkflowBuilderViewProps> = ({ project, onBack, apiTools, workflows }) => {
+  // For now, we just load the first workflow as a default for the builder.
+  // A real app would have a selection mechanism.
+  const activeWorkflow = workflows[0] || { nodes: initialNodes, edges: initialEdges };
+
+  const [nodes, setNodes] = useState<WorkflowNode[]>(activeWorkflow.nodes);
+  const [edges, setEdges] = useState<Edge[]>(activeWorkflow.edges);
   const [drawingEdge, setDrawingEdge] = useState<{ startNodeId: string; startPos: { x: number; y: number }; endPos: { x: number; y: number } } | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);

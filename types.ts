@@ -127,6 +127,14 @@ export interface Edge {
     id: string;
     source: string;
     target: string;
+    label?: string; // e.g., 'Yes' or 'No' for conditional branches
+}
+
+export interface Workflow {
+    id: string;
+    name: string;
+    nodes: WorkflowNode[];
+    edges: Edge[];
 }
 
 // --- API Tool Types ---
