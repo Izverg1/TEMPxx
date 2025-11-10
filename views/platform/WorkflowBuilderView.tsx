@@ -12,16 +12,20 @@ interface WorkflowBuilderViewProps {
   onBack: () => void;
 }
 
+const StartIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" /></svg>;
 const LLMIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z" /></svg>;
 const ToolIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" /></svg>;
 const ConditionalIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 015 3h12a1 1 0 01.707 1.707L15 8v4l2.707 3.293A1 1 0 0117 17H5a1 1 0 01-.707-1.707L7 12V8L4.293 4.707A1 1 0 013 4v-.707z" clipRule="evenodd" /></svg>;
-const DataIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M3 12v3c0 1.657 3.134 3 7 3s7-1.343 7-3v-3c0 1.657-3.134 3-7 3s-7-1.343-7-3z" /><path d="M3 7v3c0 1.657 3.134 3 7 3s7-1.343 7-3V7c0 1.657-3.134 3-7 3S3 8.657 3 7z" /><path d="M17 5c0 1.657-3.134 3-7 3S3 6.657 3 5s3.134-3 7-3 7 1.343 7 3z" /></svg>;
+const DataIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M3 12v3c0 1.657 3.134 3 7 3s7-1.343 7-3v-3c0 1.657-3.134 3-7 3s-7-1.343-7-3z" /><path d="M3 7v3c0 1.657 3.134 3 7 3s7-1.343-7-3V7c0 1.657-3.134 3-7 3S3 8.657 3 7z" /><path d="M17 5c0 1.657-3.134 3-7 3S3 6.657 3 5s3.134-3 7-3 7 1.343 7 3z" /></svg>;
+const EndIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clipRule="evenodd" /></svg>;
 
 const nodeTypes: { type: NodeType; title: string; description: string; icon: React.ReactNode }[] = [
+    { type: 'Start', title: 'Start Node', description: 'Entry point for workflow execution.', icon: <StartIcon/> },
     { type: 'LLM', title: 'LLM Node', description: 'Executes a pure LLM turn.', icon: <LLMIcon/> },
     { type: 'Tool', title: 'Tool Node', description: 'Calls an external API.', icon: <ToolIcon/> },
     { type: 'Conditional', title: 'Conditional Node', description: 'Decision gate based on logic.', icon: <ConditionalIcon/> },
     { type: 'Data', title: 'Data Node', description: 'Reads/writes to state memory.', icon: <DataIcon/> },
+    { type: 'End', title: 'End Node', description: 'Completes the workflow.', icon: <EndIcon/> },
 ];
 
 const NodePaletteItem: React.FC<{ nodeType: typeof nodeTypes[0], onDragStart: (e: React.DragEvent, type: NodeType, data: any) => void }> = ({ nodeType, onDragStart }) => (
@@ -105,7 +109,20 @@ const WorkflowBuilderView: React.FC<WorkflowBuilderViewProps> = ({ project, onBa
   }, [handleDeleteSelected]);
 
   const handleDragStart = (e: React.DragEvent, type: NodeType, data: any) => {
-    const config = type === 'LLM' ? { prompt: '' } : type === 'Tool' ? { toolId: null, parameterValues: {} } : {};
+    const config = (() => {
+      switch (type) {
+        case 'LLM':
+          return { prompt: '' };
+        case 'Tool':
+          return { toolId: null, parameterValues: {} };
+        case 'Conditional':
+          return { condition: '' };
+        case 'Data':
+          return { operation: 'write', variableName: '', value: '' };
+        default:
+          return {};
+      }
+    })();
     const fullData = { ...data, config };
     e.dataTransfer.setData('application/reactflow', JSON.stringify({ type, data: fullData }));
     e.dataTransfer.effectAllowed = 'move';
