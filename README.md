@@ -1,20 +1,16 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Frontier Relay
 
-# Run and deploy your AI Studio app
+Frontier Relay is an early C++ desktop-core prototype for local-first AI coding delegation. The current vertical slice routes a bounded task by capability to a deterministic local adapter, creates an isolated temporary artifact, validates it, computes evidence-based confidence, and returns `ACCEPT` or an escalation action.
 
-This contains everything you need to run your app locally.
+The adapter is deliberately a **test double**, not a real language model. See [the reference architecture](docs/REFERENCE_ARCHITECTURE.md) for the production boundaries, PGlite decision, risks, and phased plan.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1leKqtLQiHJungknfHSwPpkHI84hDkbQ7
+## Build and run
 
-## Run Locally
+```sh
+cmake -S . -B build
+cmake --build build
+ctest --test-dir build --output-on-failure
+./build/frontier-relay "Create a documented configuration option"
+```
 
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+The unrelated pre-existing Vite demonstration remains available through `npm run dev`; it is not yet integrated with the C++ core and is not the planned Dear ImGui UI.
